@@ -1,0 +1,31 @@
+name: Tag Release
+
+on:
+  pull_request_target:
+    types:
+      - closed
+
+permissions:
+  contents: write
+  pull-requests: read
+
+concurrency:
+  group: release-tag-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Create release tag
+        uses: leo-oliveira-eng/tag-semver-action@485efe27b269939e42e318177fc55542cac49435 # 0.1.2
+        with:
+          token: ${{ github.token }}
